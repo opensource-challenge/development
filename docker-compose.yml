@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  api:
+    image: elixir:1.8
+    ports:
+      - '4000:4000'
+    volumes:
+      - ./api:/root/app
+      - ./api-entrypoint.sh:/root/api-entrypoint.sh
+    entrypoint: /root/api-entrypoint.sh
+    working_dir: /root/app
+    depends_on:
+      - db
+
+  client:
+    image: danlynn/ember-cli
+    ports:
+      - "4200:4200"
+      - "7020:7020"
+      - "7357:7357"
+    volumes:
+      - ./client:/myapp
+      - ./client-entrypoint.sh:/root/client-entrypoint.sh
+      - node_modules:/myapp/node_modules
+    entrypoint: /root/client-entrypoint.sh
+    working_dir: /myapp
+    network_mode: host
+
+  db:
+    image: postgres:11-alpine
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: opensource_challenge_dev
+      POSTGRES_PASSWORD: postgres
+
+volumes:
+  db_data: {}
+  node_modules: {}
